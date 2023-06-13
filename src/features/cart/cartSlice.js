@@ -1,8 +1,16 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import cartItems from "../../cartItems";
 
+const Url = 'https://course-api.com/react-useReducer-cart-project';
+
+export const getCartItems = createAsyncThunk('cart/getcartitems', () => {
+    return fetch(Url)
+        .then((resp) => resp.json())
+        .catch((err)=> console.log(err))
+})
+
 const initialState = {
-    cartItems : cartItems,
+    cartItems : [],
     amount : 0,
     total: 0,
     isLoading: true,
@@ -39,6 +47,19 @@ const cartslice = createSlice({
             state.total = total;
         }
     },
+
+    extraReducers: {
+        [getCartItems.pending]: (state) => {
+            state.isLoading = true
+        },
+        [getCartItems.fulfilled]: (state, action) => {
+            state.isLoading = false
+            state.cartItems = action.payload;
+        },
+        [getCartItems.rejected]: (state) => {
+            state.isLoading = false
+        }
+    }
 });
 
 // console.log(cartslice)
